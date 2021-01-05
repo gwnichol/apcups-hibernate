@@ -1,0 +1,44 @@
+#!/bin/bash
+
+case $2 in
+
+  # In the event the computer is hibernating.
+  hibernate)
+    case $1 in
+
+       # Going into a hibernate state.
+       pre)
+
+         # See if this is a powerfail situation.
+         if [ -f /etc/apcupsd/powerfail ]; then
+           echo
+           echo "ACPUPSD will now power off the UPS"
+           echo
+           /etc/apcupsd/apccontrol killpower
+           echo
+           echo "Please ensure that the UPS has powered off before rebooting"
+           echo "Otherwise, the UPS may cut the power during the reboot!!!"
+           echo
+         fi
+       ;;
+
+       # Coming out of a hibernate state.
+       post)
+
+         # If there are remnants from a powerfail situation, remove them.
+         if [ -f /etc/apcupsd/powerfail ]; then
+           rm /etc/apcupsd/powerfail
+         fi
+
+         # This may also exist, need to remove it.
+         if [ -f /etc/nologin ]; then
+           rm /etc/nologin
+         fi
+
+	 # Restart the daemon; otherwise it may be unresponsive in a
+         # second powerfailure situation.
+	 systemctl restart apcupsd
+       ;;
+    esac
+  ;;
+esac

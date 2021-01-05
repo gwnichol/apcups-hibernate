@@ -1,0 +1,12 @@
+#!/bin/bash
+# Hibernate the system - designed to be called via symlink from /etc/apcupsd
+# directory in case of apcupsd initiating a shutdown/reboot.  Can also be used
+# interactively or from any script to cause a hibernate.
+
+# Do the hibernate
+systemctl hibernate
+
+# At this point system should be hibernated - when it comes back, we resume this script here
+
+# On resume, tell controlling script (/etc/apcupsd/apccontrol) NOT to continue with default action (i.e. shutdown).
+exit 99
